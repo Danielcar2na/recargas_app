@@ -13,6 +13,8 @@ dependencies:
   flutter_riverpod: ^2.6.1  # Versión más reciente
   http: ^1.3.0  # Versión más reciente
   riverpod_annotation: ^2.6.1  # Versión más reciente
+  sqflite: ^2.3.0
+  path_provider: ^2.1.1
 
 dev_dependencies:
   flutter_test:

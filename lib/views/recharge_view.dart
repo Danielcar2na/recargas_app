@@ -19,7 +19,8 @@ class RechargeView extends ConsumerStatefulWidget {
 }
 
 class _RechargeViewState extends ConsumerState<RechargeView> {
-  String? selectedProviderId; // Almacena el ID del proveedor seleccionado
+  String? selectedProviderId;
+  
 
   @override
   Widget build(BuildContext context) {
@@ -144,29 +145,37 @@ class _RechargeViewState extends ConsumerState<RechargeView> {
   }
 
   // Función para validar y ejecutar la recarga
-  void _attemptRecharge() {
-    final phone = widget.controllerCel.text.trim();
-    final amount = double.tryParse(widget.controllerPrice.text.trim()) ?? 0;
+ void _attemptRecharge() {
+  final phone = widget.controllerCel.text.trim();
+  final amount = double.tryParse(widget.controllerPrice.text.trim()) ?? 0;
 
-    if (phone.length == 10 && !phone.startsWith('3')) {
-      _showErrorMessage("Número de teléfono debe empezar por 3xxxxxxxxx");
-      return;
-    }
-
-    if (amount < 1000 && amount > 100000) {
-      _showErrorMessage("El monto debe estar entre 1,000 y 100,000");
-      return;
-    }
-
-    if (selectedProviderId == null) {
-      _showErrorMessage("Debe seleccionar un operador");
-      return;
-    }
-
-    ref
-        .read(rechargeProvider.notifier)
-        .buyRecharge(phone, selectedProviderId!, amount);
+  if (phone.length != 10 || !phone.startsWith('3')) {
+    _showErrorMessage("Número de teléfono inválido");
+    return;
   }
+
+  if (amount < 1000 || amount > 100000) {
+    _showErrorMessage("El monto debe estar entre 1,000 y 100,000");
+    return;
+  }
+
+  if (selectedProviderId == null) {
+    _showErrorMessage("Debe seleccionar un operador");
+    return;
+  }
+
+  ref.read(rechargeProvider.notifier).buyRecharge(phone, selectedProviderId!, amount);
+
+  // ✅ Limpiar campos después de 3 segundos
+  Future.delayed(Duration(seconds: 3), () {
+    setState(() {
+      widget.controllerCel.clear();
+      widget.controllerOperator.clear();
+      widget.controllerPrice.clear();
+      selectedProviderId = null;
+    });
+  });
+}
 
   // Función para mostrar proveedores en un modal
   void _showSupplierSelection(

@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:recargas_app/models/operator_model.dart';
 import 'package:recargas_app/providers/auth_providers.dart';
 import 'package:recargas_app/routes/paths.dart';
+import 'package:recargas_app/views/history_view.dart';
 import 'package:recargas_app/views/login_view.dart';
 import 'recharge_view.dart';
 
@@ -92,6 +93,15 @@ class _HomeViewState extends ConsumerState<HomeView> {
             ),
             SizedBox(height: height * 0.02),
             const Spacer(),
+            ElevatedButton(
+  onPressed: () {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (_) => HistoryView()),
+    );
+  },
+  child: Text('Ver Historial'),
+),
             ButtonCustom(
               width: width,
               height: height,

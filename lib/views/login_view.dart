@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:recargas_app/providers/auth_providers.dart';
+import 'package:recargas_app/routes/paths.dart';
 import 'package:recargas_app/views/home_view.dart';
 
 class LoginView extends ConsumerWidget {
@@ -36,7 +37,7 @@ class LoginView extends ConsumerWidget {
               child: Column(
                 children: [
                   SizedBox(height: height * 0.18),
-                  Image.asset('assets/logos/LogoTextPuntoRed.png'),
+                  Image.asset(Paths.logoTextPuntoRed),
                   SizedBox(height: height * 0.2),
                   TextFormFieldCustom(
                     width: width,
