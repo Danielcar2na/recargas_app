@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:http/http.dart' as ref;
 import 'package:recargas_app/providers/auth_providers.dart';
 import 'package:recargas_app/views/home_view.dart';
-import 'package:recargas_app/views/recharge_view.dart';
 
 class LoginView extends ConsumerWidget {
   LoginView({super.key});
@@ -32,45 +30,46 @@ class LoginView extends ConsumerWidget {
               end: Alignment.bottomCenter,
             ),
           ),
-          child: SafeArea(
-            child: Padding(
-              padding: EdgeInsets.symmetric(horizontal: width * 0.03),
-              child: SingleChildScrollView(
-                child: Column(
-                  children: [
-                    SizedBox(height: height * 0.18),
-                    Image.asset('assets/logos/LogoTextPuntoRed.png'),
-                    SizedBox(height: height * 0.2),
-                    TextFormFieldCustom(
-                      width: width,
-                      controller: controllerText,
-                      focusNode: _focusNodeUser,
-                      hintText: 'User',
-                    ),
-                    SizedBox(height: height * 0.02),
-                    TextFormFieldCustom(
-                      width: width,
-                      controller: controllerPass,
-                      focusNode: _focusNodePass,
-                      hintText: 'Password',
-                      obscureText: true,
-                    ),
-                    SizedBox(height: height * 0.2),
-                    ButtonCustom(
-                      width: width,
-                      height: height,
-                      ontap: () {
-                        ref.read(authProvider.notifier).login();
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(builder: (_) => HomeView()),
-                        );
-                      },
-                      text: 'Sign In',
-                    ),
-                    SizedBox(height: height * 0.05,)
-                  ],
-                ),
+          child: Padding(
+            padding: EdgeInsets.symmetric(horizontal: width * 0.03),
+            child: SingleChildScrollView(
+              child: Column(
+                children: [
+                  SizedBox(height: height * 0.18),
+                  Image.asset('assets/logos/LogoTextPuntoRed.png'),
+                  SizedBox(height: height * 0.2),
+                  TextFormFieldCustom(
+                    width: width,
+                    controller: controllerText,
+                    focusNode: _focusNodeUser,
+                    hintText: 'User',
+                  ),
+                  SizedBox(height: height * 0.02),
+                  TextFormFieldCustom(
+                    width: width,
+                    controller: controllerPass,
+                    focusNode: _focusNodePass,
+                    hintText: 'Password',
+                    obscureText: true,
+                  ),
+                  SizedBox(height: height * 0.2),
+                  ButtonCustom(
+                    width: width,
+                    height: height,
+                    colorText: Colors.pinkAccent,
+                    ontap: 
+                    controllerText.text.isNotEmpty && controllerPass.text.isNotEmpty
+                    ?() {
+                      ref.read(authProvider.notifier).login();
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (_) => HomeView()),
+                      );
+                    }
+                    :(){},
+                    text: 'Sign In'),
+                  //SizedBox(height: height * 0.05)
+                ],
               ),
             ),
           ),
@@ -87,8 +86,8 @@ class ButtonCustom extends StatelessWidget {
     required this.height,
     required this.ontap,
     required this.text,
-     this.colorText = Colors.black,
-     this.colorButton = Colors.white,
+    this.colorText = Colors.black,
+    this.colorButton = Colors.white,
   });
 
   final double width;
@@ -110,7 +109,10 @@ class ButtonCustom extends StatelessWidget {
           color: colorButton,
           borderRadius: BorderRadius.circular(8),
         ),
-        child: Text(text, style: TextStyle(color: colorText),),
+        child: Text(
+          text,
+          style: TextStyle(color: colorText),
+        ),
       ),
     );
   }
@@ -124,13 +126,18 @@ class TextFormFieldCustom extends StatelessWidget {
     this.obscureText = false,
     required this.controller,
     required this.focusNode,
+    this.colorBorde = Colors.white,
+    this.enable = true,  this.keyboardType = TextInputType.text,
   });
 
   final double width;
   final TextEditingController controller;
   final String hintText;
-  final bool obscureText;
   final FocusNode focusNode;
+  final bool obscureText;
+  final bool enable;
+  final Color colorBorde;
+  final TextInputType keyboardType;
 
   @override
   Widget build(BuildContext context) {
@@ -138,14 +145,20 @@ class TextFormFieldCustom extends StatelessWidget {
       padding: EdgeInsets.symmetric(horizontal: width * 0.05),
       alignment: Alignment.center,
       decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(8),
-      ),
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(8),
+          border: Border.all(
+            color: colorBorde,
+          )),
       child: TextFormField(
+        enabled: enable,
         focusNode: focusNode,
         controller: controller,
+        keyboardType: keyboardType,
+        style: TextStyle(color: Colors.black,),
         decoration: InputDecoration(
           hintText: hintText,
+          hintStyle: TextStyle(color: Colors.black54),
           border: InputBorder.none,
         ),
         obscureText: obscureText,

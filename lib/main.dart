@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:recargas_app/views/home_view.dart';
 import 'package:recargas_app/views/login_view.dart';
 
 void main() {

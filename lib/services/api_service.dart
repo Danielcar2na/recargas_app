@@ -2,14 +2,14 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 
 class ApiService {
-  static const String _baseUrl =
+  static const String baseUrl =
       "https://us-central1-puntored-dev.cloudfunctions.net/technicalTest-developer/api";
   static const String _apiKey =
       "mtrQF6Q11eosqyQnkMY0JGFbGqcxVg5icvfVnX1ifIyWDvwGApJ8WUM8nHVrdSkN";
 
   Future<String?> authenticate() async {
   final response = await http.post(
-    Uri.parse("$_baseUrl/auth"),
+    Uri.parse("$baseUrl/auth"),
     headers: {"x-api-key": _apiKey, "Content-Type": "application/json"},
     body: jsonEncode({"user": "user0147", "password": "#3Q34Sh0NlDS"}),
   );
@@ -26,8 +26,8 @@ class ApiService {
 }
   Future<List<Map<String, String>>?> getSuppliers(String token) async {
     final response = await http.get(
-      Uri.parse("$_baseUrl/getSuppliers"),
-      headers: {"authorization": "Bearer $token"},
+      Uri.parse("$baseUrl/getSuppliers"),
+      headers: {"authorization": "$token"},
     );
 
     if (response.statusCode == 200) {
