@@ -1,6 +1,6 @@
+import 'package:recargas_app/models/recharge_model.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
-import '../models/recharge_model.dart';
 
 class DatabaseHelper {
   static Database? _database;
@@ -51,5 +51,24 @@ class DatabaseHelper {
   Future<void> deleteAllRecharges() async {
     final db = await database;
     await db.delete('recargas');
+  }
+
+  Future<int> updateRecharge(Recharge recharge) async {
+    final db = await database;
+    return await db.update(
+      'recargas',
+      recharge.toMap(),
+      where: 'id = ?',
+      whereArgs: [recharge.id],
+    );
+  }
+
+  Future<int> deleteRecharge(int id) async {
+    final db = await database;
+    return await db.delete(
+      'recargas',
+      where: 'id = ?',
+      whereArgs: [id],
+    );
   }
 }

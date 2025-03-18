@@ -13,11 +13,7 @@ class AuthNotifier extends StateNotifier<String?> {
   Future<void> login() async {
     final token = await _apiService.authenticate();
     if (token != null) {
-      state = token; // Guarda el token en el estado
+      state = token;
     }
-    
-  //final token = ref.watch(authProvider);
-  print("Token actual: $token");
   }
-
 }

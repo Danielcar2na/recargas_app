@@ -13,7 +13,6 @@ class Recharge {
     required this.date,
   });
 
-  // Convertir un objeto Recharge a un mapa (para guardar en SQLite)
   Map<String, dynamic> toMap() {
     return {
       'id': id,
@@ -24,7 +23,6 @@ class Recharge {
     };
   }
 
-  // Convertir un mapa de SQLite a un objeto Recharge
   factory Recharge.fromMap(Map<String, dynamic> map) {
     return Recharge(
       id: map['id'],

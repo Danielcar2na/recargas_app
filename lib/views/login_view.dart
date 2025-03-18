@@ -69,7 +69,6 @@ class LoginView extends ConsumerWidget {
                     }
                     :(){},
                     text: 'Sign In'),
-                  //SizedBox(height: height * 0.05)
                 ],
               ),
             ),

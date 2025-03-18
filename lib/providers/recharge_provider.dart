@@ -18,7 +18,8 @@ class RechargeNotifier extends StateNotifier<AsyncValue<String?>> {
   final Ref ref;
   final ApiService _apiService = ApiService();
 
-  Future<void> buyRecharge(String phone, String providerId, double amount) async {
+  Future<void> buyRecharge(
+      String phone, String providerId, double amount) async {
     state = const AsyncValue.loading();
     final token = ref.read(authProvider);
 
@@ -45,7 +46,6 @@ class RechargeNotifier extends StateNotifier<AsyncValue<String?>> {
         final data = jsonDecode(response.body);
         state = AsyncValue.data("✅ Recarga exitosa: ${data["message"]}");
 
-        // ✅ Guardar la recarga en SQLite
         await DatabaseHelper.instance.insertRecharge(Recharge(
           phoneNumber: phone,
           provider: providerId,
@@ -53,16 +53,14 @@ class RechargeNotifier extends StateNotifier<AsyncValue<String?>> {
           date: DateTime.now().toIso8601String(),
         ));
 
-        // ✅ Refrescar historial de recargas
         ref.invalidate(historyProvider);
 
-        // ✅ Restablecer el estado y limpiar campos después de 3 segundos
         Future.delayed(Duration(seconds: 3), () {
           state = const AsyncValue.data(null);
         });
-
       } else {
-        state = AsyncValue.error("❌ Error en la recarga: ${response.body}", StackTrace.empty);
+        state = AsyncValue.error(
+            "❌ Error en la recarga: ${response.body}", StackTrace.empty);
       }
     } catch (e) {
       state = AsyncValue.error("❌ Error de conexión: $e", StackTrace.empty);

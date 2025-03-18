@@ -22,7 +22,7 @@ class _HomeViewState extends ConsumerState<HomeView> {
       Operator(Paths.claro, 'Claro'),
       Operator(Paths.movistar, 'Movistar'),
       Operator(Paths.tigo, 'Tigo'),
-      Operator(Paths.wom, 'Wom'),
+      Operator(Paths.wom, 'wom'),
     ],
   };
 
@@ -67,16 +67,20 @@ class _HomeViewState extends ConsumerState<HomeView> {
             SizedBox(height: height * 0.02),
             SizedBox(
               height: height * 0.12,
-              width: width, // Ajusta el tamaño del ListView
+              width: width,
               child: ListView.builder(
                 controller: _pageController,
                 scrollDirection: Axis.horizontal,
                 itemCount: operatorList.length,
                 itemBuilder: (context, index) {
                   final operator = operatorList[index];
-                  return GestureDetector(
+                  return InkWell(
                     onTap: () {
-                      print('Seleccionaste: ${operator.name}');
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (_) => RechargeView(operator.name)),
+                      );
                     },
                     child: Card(
                       shape: RoundedRectangleBorder(
@@ -93,22 +97,30 @@ class _HomeViewState extends ConsumerState<HomeView> {
             ),
             SizedBox(height: height * 0.02),
             const Spacer(),
-            ElevatedButton(
-  onPressed: () {
-    Navigator.push(
-      context,
-      MaterialPageRoute(builder: (_) => HistoryView()),
-    );
-  },
-  child: Text('Ver Historial'),
-),
+            Padding(
+              padding: EdgeInsets.only(left: width * 0.8),
+              child: FloatingActionButton(
+                backgroundColor: Colors.pinkAccent,
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (_) => HistoryView()),
+                  );
+                },
+                child: Icon(
+                  Icons.receipt_long,
+                  color: Colors.white,
+                ),
+              ),
+            ),
+            SizedBox(height: height * 0.05),
             ButtonCustom(
               width: width,
               height: height,
               ontap: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (_) => RechargeView()),
+                  MaterialPageRoute(builder: (context) => RechargeView('')),
                 );
               },
               text: 'Ir a Recargar',

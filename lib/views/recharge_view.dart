@@ -5,7 +5,8 @@ import '../providers/supplier_provider.dart';
 import '../providers/recharge_provider.dart';
 
 class RechargeView extends ConsumerStatefulWidget {
-  RechargeView({super.key});
+  final String supplierHome;
+  RechargeView(this.supplierHome, {super.key});
 
   final TextEditingController controllerCel = TextEditingController();
   final TextEditingController controllerOperator = TextEditingController();
@@ -20,7 +21,27 @@ class RechargeView extends ConsumerStatefulWidget {
 
 class _RechargeViewState extends ConsumerState<RechargeView> {
   String? selectedProviderId;
-  
+  @override
+  void initState() {
+    super.initState();
+
+    if (widget.supplierHome.isNotEmpty) {
+      Future.microtask(() {
+        final suppliers = ref.read(supplierProvider).value;
+        if (suppliers != null) {
+          for (var supplier in suppliers) {
+            if (widget.supplierHome == supplier["name"]) {
+              setState(() {
+                widget.controllerOperator.text = supplier["name"]!;
+                selectedProviderId = supplier["id"]!;
+              });
+              break;
+            }
+          }
+        }
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -52,15 +73,13 @@ class _RechargeViewState extends ConsumerState<RechargeView> {
             const SizedBox(height: 20),
             TextFormFieldCustom(
               width: width,
-              hintText: 'Cel',
+              hintText: 'ingresa el celular',
               controller: widget.controllerCel,
               focusNode: widget._focusNodeCel,
               colorBorde: Colors.black12,
               keyboardType: TextInputType.phone,
             ),
             const SizedBox(height: 20),
-
-            // Campo Operador con selección de proveedor
             InkWell(
               onTap: () {
                 supplierAsyncValue.maybeWhen(
@@ -71,7 +90,7 @@ class _RechargeViewState extends ConsumerState<RechargeView> {
                             content: Text("No hay proveedores disponibles.")),
                       );
                     } else {
-                      _showSupplierSelection(context, suppliers);
+                      showSupplierSelection(context, suppliers);
                     }
                   },
                   orElse: () => ScaffoldMessenger.of(context).showSnackBar(
@@ -84,10 +103,9 @@ class _RechargeViewState extends ConsumerState<RechargeView> {
                 controller: widget.controllerOperator,
                 focusNode: widget._focusNodeOperator,
                 colorBorde: Colors.black12,
-                enable: false, // Deshabilitado para forzar selección por modal
+                enable: false,
               ),
             ),
-
             const SizedBox(height: 20),
             TextFormFieldCustom(
               width: width,
@@ -118,8 +136,6 @@ class _RechargeViewState extends ConsumerState<RechargeView> {
               child: const Text('\$ 300000'),
             ),
             const Spacer(),
-
-            // Botón de Recarga con lógica
             rechargeState.when(
               data: (message) => message != null
                   ? Text(message, style: TextStyle(color: Colors.green))
@@ -144,41 +160,40 @@ class _RechargeViewState extends ConsumerState<RechargeView> {
     );
   }
 
-  // Función para validar y ejecutar la recarga
- void _attemptRecharge() {
-  final phone = widget.controllerCel.text.trim();
-  final amount = double.tryParse(widget.controllerPrice.text.trim()) ?? 0;
+  void _attemptRecharge() {
+    final phone = widget.controllerCel.text.trim();
+    final amount = double.tryParse(widget.controllerPrice.text.trim()) ?? 0;
 
-  if (phone.length != 10 || !phone.startsWith('3')) {
-    _showErrorMessage("Número de teléfono inválido");
-    return;
-  }
+    if (phone.length != 10 || !phone.startsWith('3')) {
+      _showErrorMessage("Número de teléfono inválido");
+      return;
+    }
 
-  if (amount < 1000 || amount > 100000) {
-    _showErrorMessage("El monto debe estar entre 1,000 y 100,000");
-    return;
-  }
+    if (amount < 1000 || amount > 100000) {
+      _showErrorMessage("El monto debe estar entre 1,000 y 100,000");
+      return;
+    }
 
-  if (selectedProviderId == null) {
-    _showErrorMessage("Debe seleccionar un operador");
-    return;
-  }
+    if (selectedProviderId == null) {
+      _showErrorMessage("Debe seleccionar un operador");
+      return;
+    }
 
-  ref.read(rechargeProvider.notifier).buyRecharge(phone, selectedProviderId!, amount);
+    ref
+        .read(rechargeProvider.notifier)
+        .buyRecharge(phone, selectedProviderId!, amount);
 
-  // ✅ Limpiar campos después de 3 segundos
-  Future.delayed(Duration(seconds: 3), () {
-    setState(() {
-      widget.controllerCel.clear();
-      widget.controllerOperator.clear();
-      widget.controllerPrice.clear();
-      selectedProviderId = null;
+    Future.delayed(Duration(seconds: 3), () {
+      setState(() {
+        widget.controllerCel.clear();
+        widget.controllerOperator.clear();
+        widget.controllerPrice.clear();
+        selectedProviderId = null;
+      });
     });
-  });
-}
+  }
 
-  // Función para mostrar proveedores en un modal
-  void _showSupplierSelection(
+  void showSupplierSelection(
       BuildContext context, List<Map<String, String>> suppliers) {
     showModalBottomSheet(
       context: context,
