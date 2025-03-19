@@ -21,32 +21,41 @@ class HistoryNotifier extends StateNotifier<AsyncValue<List<Recharge>>> {
 
       if (userId != null) {
         final history = await DatabaseHelper.instance.getRechargesByUser(userId);
-        state = AsyncValue.data(history);
+
+        if (mounted) { // 🔹 Verifica si el provider sigue activo antes de actualizar el estado
+          state = AsyncValue.data(history);
+        }
       } else {
-        state = AsyncValue.data([]);
+        if (mounted) {
+          state = AsyncValue.data([]);
+        }
       }
     } catch (e) {
-      state = AsyncValue.error("Error al cargar historial: $e", StackTrace.empty);
+      if (mounted) { // 🔹 Evita errores cuando el provider ha sido eliminado
+        state = AsyncValue.error("Error al cargar historial: $e", StackTrace.empty);
+      }
     }
   }
 
-  // 🔹 Eliminar recarga y actualizar historial
   Future<void> deleteRecharge(int rechargeId) async {
     try {
       await DatabaseHelper.instance.deleteRecharge(rechargeId);
       _loadHistory();
     } catch (e) {
-      state = AsyncValue.error("Error al eliminar recarga: $e", StackTrace.empty);
+      if (mounted) {
+        state = AsyncValue.error("Error al eliminar recarga: $e", StackTrace.empty);
+      }
     }
   }
 
-  // 🔹 Editar recarga y actualizar historial
   Future<void> updateRecharge(Recharge recharge) async {
     try {
       await DatabaseHelper.instance.updateRecharge(recharge);
       _loadHistory();
     } catch (e) {
-      state = AsyncValue.error("Error al actualizar recarga: $e", StackTrace.empty);
+      if (mounted) {
+        state = AsyncValue.error("Error al actualizar recarga: $e", StackTrace.empty);
+      }
     }
   }
 }
