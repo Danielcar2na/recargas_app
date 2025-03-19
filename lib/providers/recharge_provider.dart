@@ -18,17 +18,22 @@ class RechargeNotifier extends StateNotifier<AsyncValue<String?>> {
   final Ref ref;
   final ApiService _apiService = ApiService();
 
-  Future<void> buyRecharge(
-      String phone, String providerId, double amount) async {
+  Future<void> buyRecharge(String phone, String providerId, double amount) async {
     state = const AsyncValue.loading();
-    final token = ref.read(authProvider);
+    
+    // 🔹 Obtener usuario autenticado
+    final authState = ref.read(authProvider);
+    final userId = authState.whenOrNull(data: (user) => user?["id"] as int?); // ✅ Convertimos a int
 
-    if (token == null) {
+    if (userId == null) {
       state = AsyncValue.error("Error: No autenticado", StackTrace.empty);
       return;
     }
 
     try {
+      // 🔹 Obtener token de la sesión
+      final token = authState.whenOrNull(data: (user) => user?["token"]);
+
       final response = await http.post(
         Uri.parse("${ApiService.baseUrl}/buy"),
         headers: {
@@ -46,21 +51,26 @@ class RechargeNotifier extends StateNotifier<AsyncValue<String?>> {
         final data = jsonDecode(response.body);
         state = AsyncValue.data("✅ Recarga exitosa: ${data["message"]}");
 
-        await DatabaseHelper.instance.insertRecharge(Recharge(
-          phoneNumber: phone,
-          provider: providerId,
-          amount: amount,
-          date: DateTime.now().toIso8601String(),
-        ));
+        // 🔹 Guardar recarga en SQLite con el `userId`
+        await DatabaseHelper.instance.insertRecharge(
+          Recharge(
+            userId: userId, // ✅ Asignamos la recarga al usuario autenticado
+            phoneNumber: phone,
+            provider: providerId,
+            amount: amount,
+            date: DateTime.now().toIso8601String(),
+          ),
+          userId,
+        );
 
-        ref.invalidate(historyProvider);
+        ref.invalidate(historyProvider); // 🔹 Refrescar historial
 
+        // 🔹 Limpiar estado después de 3 segundos
         Future.delayed(Duration(seconds: 3), () {
           state = const AsyncValue.data(null);
         });
       } else {
-        state = AsyncValue.error(
-            "❌ Error en la recarga: ${response.body}", StackTrace.empty);
+        state = AsyncValue.error("❌ Error en la recarga: ${response.body}", StackTrace.empty);
       }
     } catch (e) {
       state = AsyncValue.error("❌ Error de conexión: $e", StackTrace.empty);

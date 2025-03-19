@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:recargas_app/providers/auth_providers.dart';
 import 'package:recargas_app/routes/paths.dart';
 import 'package:recargas_app/views/home_view.dart';
+import 'package:recargas_app/views/register_view.dart';
 
 class LoginView extends ConsumerWidget {
   LoginView({super.key});
@@ -13,8 +14,20 @@ class LoginView extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final authState = ref.watch(authProvider);
+
+    ref.listen(authProvider, (previous, next) {
+      if (next is AsyncData && next.value != null) {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (_) => HomeView()),
+        );
+      }
+    });
+
     final double width = MediaQuery.of(context).size.width;
     final double height = MediaQuery.of(context).size.height;
+
     return Scaffold(
       body: InkWell(
         onTap: () {
@@ -39,6 +52,15 @@ class LoginView extends ConsumerWidget {
                   SizedBox(height: height * 0.18),
                   Image.asset(Paths.logoTextPuntoRed),
                   SizedBox(height: height * 0.2),
+                  Align(
+                    alignment: Alignment.centerLeft,
+                    child: Text(
+                      'Login',
+                      style:
+                          TextStyle(fontSize: 30, fontStyle: FontStyle.italic),
+                    ),
+                  ),
+                  SizedBox(height: height * 0.02),
                   TextFormFieldCustom(
                     width: width,
                     controller: controllerText,
@@ -53,22 +75,46 @@ class LoginView extends ConsumerWidget {
                     hintText: 'Password',
                     obscureText: true,
                   ),
-                  SizedBox(height: height * 0.2),
+                  SizedBox(height: height * 0.17),
+                  if (authState is AsyncError)
+                    Padding(
+                      padding: EdgeInsets.only(bottom: 10),
+                      child: Text(
+                        "❌ ${(authState as AsyncError).error}",
+                        style: TextStyle(color: Colors.red),
+                      ),
+                    ),
                   ButtonCustom(
                     width: width,
                     height: height,
                     colorText: Colors.pinkAccent,
-                    ontap: 
-                    controllerText.text.isNotEmpty && controllerPass.text.isNotEmpty
-                    ?() {
-                      ref.read(authProvider.notifier).login();
+                    ontap: () {
+                      final user = controllerText.text.trim();
+                      final pass = controllerPass.text.trim();
+
+                      if (user.isNotEmpty && pass.isNotEmpty) {
+                        ref.read(authProvider.notifier).login(user, pass);
+                      } else {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                              content: Text("Ingrese usuario y contraseña")),
+                        );
+                      }
+                    },
+                    text: authState is AsyncLoading ? 'Cargando...' : 'Sign In',
+                  ),
+                  SizedBox(height: height * 0.01),
+                  InkWell(
+                    onTap: () {
                       Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (_) => HomeView()),
-                      );
-                    }
-                    :(){},
-                    text: 'Sign In'),
+          context,
+          MaterialPageRoute(builder: (_) => RegisterView()),
+        );
+                    },
+                      child: Text(
+                    'Register',
+                    style: TextStyle(fontSize: 16),
+                  ))
                 ],
               ),
             ),
@@ -127,7 +173,8 @@ class TextFormFieldCustom extends StatelessWidget {
     required this.controller,
     required this.focusNode,
     this.colorBorde = Colors.white,
-    this.enable = true,  this.keyboardType = TextInputType.text,
+    this.enable = true,
+    this.keyboardType = TextInputType.text,
   });
 
   final double width;
@@ -155,7 +202,9 @@ class TextFormFieldCustom extends StatelessWidget {
         focusNode: focusNode,
         controller: controller,
         keyboardType: keyboardType,
-        style: TextStyle(color: Colors.black,),
+        style: TextStyle(
+          color: Colors.black,
+        ),
         decoration: InputDecoration(
           hintText: hintText,
           hintStyle: TextStyle(color: Colors.black54),

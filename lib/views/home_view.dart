@@ -52,6 +52,19 @@ class _HomeViewState extends ConsumerState<HomeView> {
             style: TextStyle(color: Colors.white)),
         backgroundColor: Colors.pinkAccent,
         iconTheme: const IconThemeData(color: Colors.white),
+        actions: [
+          IconButton(
+            icon: Icon(Icons.logout, color: Colors.white),
+            onPressed: () {
+              ref.read(authProvider.notifier).logout(); // 🔹 Cierra sesión
+              Navigator.pushAndRemoveUntil(
+                context,
+                MaterialPageRoute(builder: (_) => LoginView()), // 🔹 Redirige al login
+                (route) => false, // 🔹 Elimina la navegación anterior
+              );
+            },
+          ),
+        ],
       ),
       body: Padding(
         padding: EdgeInsets.symmetric(horizontal: width * 0.03),
