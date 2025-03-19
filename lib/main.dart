@@ -1,18 +1,26 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:recargas_app/views/login_view.dart';
+import 'package:recargas_app/views/home_view.dart';
+import 'package:recargas_app/views/splash_view.dart';
 
 void main() {
-  runApp(ProviderScope(child: MyApp()));
+  runApp(
+    const ProviderScope(
+      child: MyApp(), // 🔹 Riverpod maneja el estado globalmente
+    ),
+  );
 }
 
 class MyApp extends StatelessWidget {
+  const MyApp({super.key});
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      title: 'Recargas App',
-      home: LoginView(),
+      home: SplashScreen(),
     );
   }
 }
+

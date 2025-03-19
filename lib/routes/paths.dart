@@ -7,4 +7,8 @@ class Paths {
 //Icons
   static const String logoPuntoRed = 'assets/logos/LogoPuntoRed.png';
   static const String logoTextPuntoRed = 'assets/logos/LogoTextPuntoRed.png';
+
+  //Splash
+  static const String splash = 'assets/images/splash.gif';
+
 }

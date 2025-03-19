@@ -10,20 +10,21 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  flutter_riverpod: ^2.6.1  # Versión más reciente
-  http: ^1.3.0  # Versión más reciente
-  riverpod_annotation: ^2.6.1  # Versión más reciente
+  flutter_riverpod: ^2.6.1
+  http: ^1.3.0
+  riverpod_annotation: ^2.6.1
   sqflite: ^2.3.0
   path_provider: ^2.1.1
+  flutter_native_splash: ^2.3.3
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
   riverpod_generator: ^2.6.5
-  build_runner: # Versión más reciente
-  custom_lint:
+  build_runner: #Versión más reciente
+  custom_lint: 
   riverpod_lint: ^2.6.5
-  flutter_lints: ^5.0.0
+  flutter_lints: ^5.0.0 
   shared_preferences: ^2.2.0
 
 flutter:
@@ -31,3 +32,11 @@ flutter:
   assets:
     - assets/logos/
     - assets/images/
+
+
+flutter_native_splash:
+  color: "#ffffff"
+  image: assets/images/splash.gif
+  android: true
+  ios: true
+  fullscreen: true
