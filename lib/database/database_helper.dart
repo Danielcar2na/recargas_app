@@ -20,7 +20,7 @@ class DatabaseHelper {
 
     return await openDatabase(
       path,
-      version: 2, // 🔹 Aumentamos la versión para aplicar cambios en la BD
+      version: 2, 
       onCreate: _createDB,
     );
   }
@@ -47,17 +47,17 @@ class DatabaseHelper {
     ''');
   }
 
-  // 🔹 Registrar usuario en SQLite
+
   Future<int> registerUser(String username, String password) async {
     final db = await database;
     try {
       return await db.insert('users', {'username': username, 'password': password});
     } catch (e) {
-      return -1; // 🔹 Retorna -1 si el usuario ya existe
+      return -1; 
     }
   }
 
-  // 🔹 Autenticar usuario (Retorna ID del usuario si existe)
+
   Future<Map<String, dynamic>?> authenticateUser(String username, String password) async {
     final db = await database;
     final result = await db.query(
@@ -68,7 +68,7 @@ class DatabaseHelper {
     return result.isNotEmpty ? result.first : null;
   }
 
-  // 🔹 Guardar recarga asociada a un usuario
+
   Future<int> insertRecharge(Recharge recharge, int userId) async {
     final db = await database;
     return await db.insert('recharges', {
@@ -80,7 +80,6 @@ class DatabaseHelper {
     });
   }
 
-  // 🔹 Obtener recargas de un usuario específico
   Future<List<Recharge>> getRechargesByUser(int userId) async {
     final db = await database;
     final result = await db.query(
@@ -91,13 +90,13 @@ class DatabaseHelper {
 
     return result.map((json) => Recharge.fromJson(json)).toList();
   }
-  // 🔹 Eliminar una recarga por ID
+
 Future<int> deleteRecharge(int rechargeId) async {
   final db = await database;
   return await db.delete('recharges', where: 'id = ?', whereArgs: [rechargeId]);
 }
 
-// 🔹 Editar una recarga
+
 Future<int> updateRecharge(Recharge recharge) async {
   final db = await database;
   return await db.update(

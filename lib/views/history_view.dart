@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:recargas_app/models/recharge_model.dart';
 import 'package:recargas_app/providers/history_provider.dart';
+import 'package:recargas_app/providers/supplier_provider.dart';
+import 'package:recargas_app/routes/paths.dart';
 
 class HistoryView extends ConsumerWidget {
   const HistoryView({super.key});
@@ -9,62 +11,109 @@ class HistoryView extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final historyAsyncValue = ref.watch(historyProvider);
+    final suppliersAsyncValue = ref.watch(supplierProvider);
     final double width = MediaQuery.of(context).size.width;
+    final double height = MediaQuery.of(context).size.height;
+
+    final Map<String, String> providerImages = {
+      "Claro": Paths.claro,
+      "Movistar": Paths.movistar,
+      "Tigo": Paths.tigo,
+      "wom": Paths.wom,
+      "Desconocido": '',
+    };
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Historial de Recargas', style: TextStyle(color: Colors.white)),
+        title: const Text('Historial de Recargas',
+            style: TextStyle(color: Colors.white)),
         backgroundColor: Colors.pinkAccent,
         iconTheme: const IconThemeData(color: Colors.white),
       ),
-      body: historyAsyncValue.when(
-        data: (recharges) {
-          if (recharges.isEmpty) {
-            return Center(child: Text("No hay recargas almacenadas."));
-          }
-
-          return ListView.builder(
-            itemCount: recharges.length,
-            itemBuilder: (context, index) {
-              final recharge = recharges[index];
-
-              return Padding(
-                padding:  EdgeInsets.symmetric(horizontal: width * 0.02),
-                child: Card(
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
-                  child: ListTile(
-                    title: Text("Celular: ${recharge.phoneNumber}"),
-                    subtitle: Text("Monto: \$${recharge.amount}\nFecha: ${recharge.date}\n ${recharge.provider}", style: TextStyle(letterSpacing: -width * 0.0015 ),),
-                    trailing: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        IconButton(
-                          icon: Icon(Icons.edit, color: Colors.blue),
-                          onPressed: () => _showEditDialog(context, ref, recharge),
+      body: Padding(
+      padding: EdgeInsets.only(top: height * 0.015),
+        child: historyAsyncValue.when(
+          data: (recharges) {
+            if (recharges.isEmpty) {
+              return Center(child: Text("No hay recargas almacenadas."));
+            }
+        
+            return suppliersAsyncValue.when(
+              data: (suppliers) {
+                return ListView.builder(
+                  itemCount: recharges.length,
+                  itemBuilder: (context, index) {
+                    final recharge = recharges[index];
+        
+                    final providerName = suppliers?.firstWhere(
+                      (supplier) => supplier["id"] == recharge.provider,
+                      orElse: () => {"name": "Desconocido"},
+                    )["name"];
+        
+                    final providerImage = providerImages[providerName] ?? '';
+        
+                    return Padding(
+                      padding: EdgeInsets.symmetric(horizontal: width * 0.02),
+                      child: Card(
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(14)),
+                        child: ListTile(
+                          title: Text("Celular: ${recharge.phoneNumber}"),
+                          subtitle: Text(
+                              "Monto: \$${recharge.amount}\nFecha: ${recharge.date}"),
+                          leading: Image.asset(
+                            providerImage,
+                            width: width * 0.15,
+                            height: height * 0.1,
+                            fit: BoxFit.contain,
+                          ),
+                          trailing: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              IconButton(
+                                icon: Icon(Icons.edit, color: Colors.blue),
+                                onPressed: () => _showEditDialog(
+                                    context, ref, recharge, suppliers ?? []),
+                              ),
+                              IconButton(
+                                icon: Icon(Icons.delete, color: Colors.red),
+                                onPressed: () => ref
+                                    .read(historyProvider.notifier)
+                                    .deleteRecharge(recharge.id!),
+                              ),
+                            ],
+                          ),
                         ),
-                        IconButton(
-                          icon: Icon(Icons.delete, color: Colors.red),
-                          onPressed: () => ref.read(historyProvider.notifier).deleteRecharge(recharge.id!),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              );
-            },
-          );
-        },
-        loading: () => Center(child: CircularProgressIndicator()),
-        error: (err, stack) => Center(child: Text("Error cargando historial: $err")),
+                      ),
+                    );
+                  },
+                );
+              },
+              loading: () => Center(child: CircularProgressIndicator()),
+              error: (err, stack) =>
+                  Center(child: Text("Error cargando proveedores: $err")),
+            );
+          },
+          loading: () => Center(child: CircularProgressIndicator()),
+          error: (err, stack) =>
+              Center(child: Text("Error cargando historial: $err")),
+        ),
       ),
     );
   }
 
-  // 🔹 Función para mostrar el formulario de edición
-  void _showEditDialog(BuildContext context, WidgetRef ref, Recharge recharge) {
-    final TextEditingController phoneController = TextEditingController(text: recharge.phoneNumber);
-    final TextEditingController amountController = TextEditingController(text: recharge.amount.toString());
-    final TextEditingController providerController = TextEditingController(text: recharge.provider);
+  void _showEditDialog(BuildContext context, WidgetRef ref, Recharge recharge,
+      List<Map<String, String>> suppliers) {
+    final TextEditingController phoneController =
+        TextEditingController(text: recharge.phoneNumber);
+    final TextEditingController amountController =
+        TextEditingController(text: recharge.amount.toString());
+
+    String selectedProviderId = recharge.provider;
+    String selectedProviderName = suppliers.firstWhere(
+      (supplier) => supplier["id"] == recharge.provider,
+      orElse: () => {"name": "Desconocido"},
+    )["name"]!;
 
     showDialog(
       context: context,
@@ -74,25 +123,51 @@ class HistoryView extends ConsumerWidget {
           content: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              TextField(controller: phoneController, decoration: InputDecoration(labelText: "Número de Celular")),
-              TextField(controller: providerController, decoration: InputDecoration(labelText: "Operador")),
-              TextField(controller: amountController, decoration: InputDecoration(labelText: "Monto"), keyboardType: TextInputType.number),
+              TextField(
+                  controller: phoneController,
+                  decoration: InputDecoration(labelText: "Número de Celular")),
+              TextField(
+                  controller: amountController,
+                  decoration: InputDecoration(labelText: "Monto"),
+                  keyboardType: TextInputType.number),
+              DropdownButtonFormField<String>(
+                value: selectedProviderId,
+                items: suppliers.map((supplier) {
+                  return DropdownMenuItem(
+                    value: supplier["id"],
+                    child: Text(supplier["name"]!),
+                  );
+                }).toList(),
+                onChanged: (newValue) {
+                  selectedProviderId = newValue!;
+                  selectedProviderName = suppliers.firstWhere(
+                    (supplier) => supplier["id"] == newValue,
+                    orElse: () => {"name": "Desconocido"},
+                  )["name"]!;
+                },
+                decoration: InputDecoration(labelText: "Operador"),
+              ),
             ],
           ),
           actions: [
-            TextButton(onPressed: () => Navigator.pop(context), child: Text("Cancelar")),
+            TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: Text("Cancelar")),
             ElevatedButton(
               onPressed: () {
                 final updatedRecharge = Recharge(
                   id: recharge.id,
                   userId: recharge.userId,
                   phoneNumber: phoneController.text.trim(),
-                  provider: providerController.text.trim(),
-                  amount: double.tryParse(amountController.text.trim()) ?? recharge.amount,
+                  provider: selectedProviderId,
+                  amount: double.tryParse(amountController.text.trim()) ??
+                      recharge.amount,
                   date: recharge.date,
                 );
 
-                ref.read(historyProvider.notifier).updateRecharge(updatedRecharge);
+                ref
+                    .read(historyProvider.notifier)
+                    .updateRecharge(updatedRecharge);
                 Navigator.pop(context);
               },
               child: Text("Guardar"),

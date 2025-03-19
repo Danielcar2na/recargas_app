@@ -10,6 +10,11 @@ final historyProvider = StateNotifierProvider<HistoryNotifier, AsyncValue<List<R
 class HistoryNotifier extends StateNotifier<AsyncValue<List<Recharge>>> {
   HistoryNotifier(this.ref) : super(const AsyncValue.loading()) {
     _loadHistory();
+    ref.listen(authProvider, (previous, next) {
+      if (previous != next) {
+        _loadHistory(); 
+      }
+    });
   }
 
   final Ref ref;
@@ -17,45 +22,41 @@ class HistoryNotifier extends StateNotifier<AsyncValue<List<Recharge>>> {
   Future<void> _loadHistory() async {
     try {
       final authState = ref.read(authProvider);
-      final userId = authState.whenOrNull(data: (user) => user?["id"] as int?);
+      final userData = authState.whenOrNull(data: (user) => user);
+      
+      if (userData == null || userData["id"] == null) {
+        state = AsyncValue.data([]); 
+        return;
+      }
 
-      if (userId != null) {
-        final history = await DatabaseHelper.instance.getRechargesByUser(userId);
+      final int userId = userData["id"] is int ? userData["id"] : int.tryParse(userData["id"].toString()) ?? 0;
+      if (userId == 0) {
+        state = AsyncValue.data([]);
+        return;
+      }
 
-        if (mounted) { // 🔹 Verifica si el provider sigue activo antes de actualizar el estado
-          state = AsyncValue.data(history);
-        }
-      } else {
-        if (mounted) {
-          state = AsyncValue.data([]);
-        }
+      final history = await DatabaseHelper.instance.getRechargesByUser(userId);
+
+    
+      history.sort((a, b) => b.date.compareTo(a.date));
+
+      if (mounted) {
+        state = AsyncValue.data(history);
       }
     } catch (e) {
-      if (mounted) { // 🔹 Evita errores cuando el provider ha sido eliminado
+      if (mounted) {
         state = AsyncValue.error("Error al cargar historial: $e", StackTrace.empty);
       }
     }
   }
 
   Future<void> deleteRecharge(int rechargeId) async {
-    try {
-      await DatabaseHelper.instance.deleteRecharge(rechargeId);
-      _loadHistory();
-    } catch (e) {
-      if (mounted) {
-        state = AsyncValue.error("Error al eliminar recarga: $e", StackTrace.empty);
-      }
-    }
+    await DatabaseHelper.instance.deleteRecharge(rechargeId);
+    _loadHistory();
   }
 
   Future<void> updateRecharge(Recharge recharge) async {
-    try {
-      await DatabaseHelper.instance.updateRecharge(recharge);
-      _loadHistory();
-    } catch (e) {
-      if (mounted) {
-        state = AsyncValue.error("Error al actualizar recarga: $e", StackTrace.empty);
-      }
-    }
+    await DatabaseHelper.instance.updateRecharge(recharge);
+    _loadHistory();
   }
 }

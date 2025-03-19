@@ -56,11 +56,11 @@ class _HomeViewState extends ConsumerState<HomeView> {
           IconButton(
             icon: Icon(Icons.logout, color: Colors.white),
             onPressed: () {
-              ref.read(authProvider.notifier).logout(); // 🔹 Cierra sesión
+              ref.read(authProvider.notifier).logout(); 
               Navigator.pushAndRemoveUntil(
                 context,
-                MaterialPageRoute(builder: (_) => LoginView()), // 🔹 Redirige al login
-                (route) => false, // 🔹 Elimina la navegación anterior
+                MaterialPageRoute(builder: (_) => LoginView()), 
+                (route) => false, 
               );
             },
           ),

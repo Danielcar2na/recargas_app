@@ -53,7 +53,7 @@ class RegisterView extends ConsumerWidget {
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
                   SizedBox(height: height * 0.18),
-                  Image.asset(Paths.logoTextPuntoRed), // Ajusta tu logo
+                  Image.asset(Paths.logoTextPuntoRed), 
                   SizedBox(height: height * 0.2),
                   Align(
                     alignment: Alignment.centerLeft,

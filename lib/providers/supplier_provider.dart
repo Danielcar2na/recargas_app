@@ -4,7 +4,7 @@ import '../services/api_service.dart';
 
 final supplierProvider = FutureProvider<List<Map<String, String>>?>((ref) async {
   final authState = ref.watch(authProvider);
-  final token = authState.whenOrNull(data: (user) => user?["token"] as String?); // ✅ Extrae solo el token
+  final token = authState.whenOrNull(data: (user) => user?["token"] as String?); 
 
   if (token != null) {
     return ApiService().getSuppliers(token);
