@@ -55,9 +55,10 @@ class _RechargeViewState extends ConsumerState<RechargeView> {
 
     return Scaffold(
       appBar: AppBar(
-        title:  Text(
+        title: Text(
           'Recarga Celular',
-          style: GoogleFonts.roboto(color: Colors.white, fontWeight: FontWeight.w800),
+          style: GoogleFonts.roboto(
+              color: Colors.white, fontWeight: FontWeight.w800),
         ),
         backgroundColor: Colors.pinkAccent,
         iconTheme: const IconThemeData(color: Colors.white),
@@ -69,10 +70,11 @@ class _RechargeViewState extends ConsumerState<RechargeView> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               const SizedBox(height: 20),
-               Text(
+              Text(
                 'Recarga Celular',
                 textAlign: TextAlign.start,
-                style: GoogleFonts.roboto(fontSize: 30, fontWeight: FontWeight.w800),
+                style: GoogleFonts.roboto(
+                    fontSize: 30, fontWeight: FontWeight.w800),
               ),
               const SizedBox(height: 20),
               TextFormFieldCustom(
@@ -119,7 +121,7 @@ class _RechargeViewState extends ConsumerState<RechargeView> {
                 keyboardType: TextInputType.number,
               ),
               const SizedBox(height: 20),
-               Text(
+              Text(
                 'Cupo disponible',
                 textAlign: TextAlign.start,
                 style: GoogleFonts.roboto(
@@ -127,41 +129,64 @@ class _RechargeViewState extends ConsumerState<RechargeView> {
                     fontStyle: FontStyle.italic,
                     color: Colors.black54),
               ),
-              
               const SizedBox(height: 20),
-              Container(
-                alignment: Alignment.center,
-                width: width * 0.3,
-                height: height * 0.06,
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: Colors.black12),
-                ),
-                child: const Text('\$ 300000'),
+              Wrap(
+                spacing: 10, // Espaciado horizontal entre elementos
+                runSpacing: 10, // Espaciado vertical entre filas
+                children: [
+                  1000,
+                  2000,
+                  5000,
+                  10000,
+                  20000,
+                  30000,
+                  40000,
+                  50000,
+                  100000
+                ]
+                    .map((value) => InkWell(
+                          onTap: () {
+                            widget.controllerPrice.text = value.toString();
+                          },
+                          child: Container(
+                            alignment: Alignment.center,
+                            width: width * 0.28,
+                            height: height * 0.06,
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(12),
+                              border: Border.all(color: Colors.black12),
+                            ),
+                            child: Text('\$ $value'),
+                          ),
+                        ))
+                    .toList(),
               ),
-              SizedBox(height: height * 0.24),
+              SizedBox(height: height * 0.1),
               Padding(
-              padding: EdgeInsets.only(left: width * 0.8),
-              child: FloatingActionButton(
-                backgroundColor: Colors.pinkAccent,
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (_) => const HistoryView()),
-                  );
-                },
-                child: const Icon(
-                  Icons.receipt_long,
-                  color: Colors.white,
+                padding: EdgeInsets.only(left: width * 0.8),
+                child: FloatingActionButton(
+                  backgroundColor: Colors.pinkAccent,
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (_) => const HistoryView()),
+                    );
+                  },
+                  child: const Icon(
+                    Icons.receipt_long,
+                    color: Colors.white,
+                  ),
                 ),
               ),
-            ),
-              SizedBox(height: height * 0.04,),
+              SizedBox(
+                height: height * 0.04,
+              ),
               rechargeState.when(
                 data: (message) => message != null
-                    ? Text(message, style:  GoogleFonts.roboto(color: Colors.green))
+                    ? Text(message,
+                        style: GoogleFonts.roboto(color: Colors.green))
                     : ButtonCustom(
-                      key: ValueKey('botonRecarga'),
+                        key: ValueKey('botonRecarga'),
                         width: width,
                         height: height,
                         ontap: () {
@@ -172,8 +197,8 @@ class _RechargeViewState extends ConsumerState<RechargeView> {
                         colorText: Colors.white,
                       ),
                 loading: () => const Center(child: CircularProgressIndicator()),
-                error: (err, _) =>
-                    Text("Error: $err", style:  GoogleFonts.roboto(color: Colors.red)),
+                error: (err, _) => Text("Error: $err",
+                    style: GoogleFonts.roboto(color: Colors.red)),
               ),
               SizedBox(height: height * 0.05),
             ],
@@ -251,9 +276,11 @@ class _RechargeViewState extends ConsumerState<RechargeView> {
           content: Text(message),
           actions: [
             TextButton(
-              onPressed: () => Navigator.pop(context),
-              child:  Text("OK",style: GoogleFonts.roboto(color: Colors.pinkAccent), )
-            ),
+                onPressed: () => Navigator.pop(context),
+                child: Text(
+                  "OK",
+                  style: GoogleFonts.roboto(color: Colors.pinkAccent),
+                )),
           ],
         );
       },
