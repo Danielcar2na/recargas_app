@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:recargas_app/views/history_view.dart';
 import 'package:recargas_app/views/login_view.dart';
 import '../providers/supplier_provider.dart';
 import '../providers/recharge_provider.dart';
@@ -126,6 +127,7 @@ class _RechargeViewState extends ConsumerState<RechargeView> {
                     fontStyle: FontStyle.italic,
                     color: Colors.black54),
               ),
+              
               const SizedBox(height: 20),
               Container(
                 alignment: Alignment.center,
@@ -137,7 +139,24 @@ class _RechargeViewState extends ConsumerState<RechargeView> {
                 ),
                 child: const Text('\$ 300000'),
               ),
-              SizedBox(height: height * 0.32),
+              SizedBox(height: height * 0.24),
+              Padding(
+              padding: EdgeInsets.only(left: width * 0.8),
+              child: FloatingActionButton(
+                backgroundColor: Colors.pinkAccent,
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (_) => const HistoryView()),
+                  );
+                },
+                child: const Icon(
+                  Icons.receipt_long,
+                  color: Colors.white,
+                ),
+              ),
+            ),
+              SizedBox(height: height * 0.04,),
               rechargeState.when(
                 data: (message) => message != null
                     ? Text(message, style:  GoogleFonts.roboto(color: Colors.green))
