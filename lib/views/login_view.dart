@@ -67,6 +67,7 @@ class LoginView extends ConsumerWidget {
                       ),
                       SizedBox(height: height * 0.02),
                       TextFormFieldCustom(
+                        key: ValueKey('ingresarUsuario'),
                         width: width,
                         controller: controllerText,
                         focusNode: _focusNodeUser,
@@ -74,6 +75,7 @@ class LoginView extends ConsumerWidget {
                       ),
                       SizedBox(height: height * 0.02),
                       TextFormFieldCustom(
+                        key: ValueKey('ingresarContrasena'),
                         width: width,
                         controller: controllerPass,
                         focusNode: _focusNodePass,
@@ -99,6 +101,7 @@ class LoginView extends ConsumerWidget {
                       ),
                       SizedBox(height: height * 0.01),
                       InkWell(
+                        key: const ValueKey('iniciarSesion'),
                         onTap: () {
                           Navigator.push(
                             context,

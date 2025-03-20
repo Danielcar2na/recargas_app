@@ -75,6 +75,7 @@ class _RechargeViewState extends ConsumerState<RechargeView> {
               ),
               const SizedBox(height: 20),
               TextFormFieldCustom(
+                key: ValueKey('ingresaCelular'),
                 width: width,
                 hintText: 'Ingresa el celular',
                 controller: widget.controllerCel,
@@ -97,6 +98,7 @@ class _RechargeViewState extends ConsumerState<RechargeView> {
                   );
                 },
                 child: TextFormFieldCustom(
+                  key: ValueKey('seleccionaOperador'),
                   width: width,
                   hintText: 'Operador',
                   controller: widget.controllerOperator,
@@ -107,6 +109,7 @@ class _RechargeViewState extends ConsumerState<RechargeView> {
               ),
               const SizedBox(height: 20),
               TextFormFieldCustom(
+                key: ValueKey('valor'),
                 width: width,
                 hintText: '¿Cuánto?',
                 controller: widget.controllerPrice,
@@ -139,6 +142,7 @@ class _RechargeViewState extends ConsumerState<RechargeView> {
                 data: (message) => message != null
                     ? Text(message, style:  GoogleFonts.roboto(color: Colors.green))
                     : ButtonCustom(
+                      key: ValueKey('botonRecarga'),
                         width: width,
                         height: height,
                         ontap: () {

@@ -126,6 +126,7 @@ class _HomeViewState extends ConsumerState<HomeView> {
             ),
             SizedBox(height: height * 0.05),
             ButtonCustom(
+              key: ValueKey('irRecarga'),
               width: width,
               height: height,
               ontap: () {
