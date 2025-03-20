@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:recargas_app/models/operator_model.dart';
 import 'package:recargas_app/providers/auth_providers.dart';
 import 'package:recargas_app/routes/paths.dart';
@@ -40,29 +41,22 @@ class _HomeViewState extends ConsumerState<HomeView> {
 
   @override
   Widget build(BuildContext context) {
-    final token = ref.watch(authProvider);
     final double width = MediaQuery.of(context).size.width;
     final double height = MediaQuery.of(context).size.height;
-
     final List<Operator> operatorList = operators['operators'] ?? [];
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Celulares y paquetes',
-            style: TextStyle(color: Colors.white)),
+        title:  Text(
+          'Facturas y recargas',
+          style: GoogleFonts.roboto(color: Colors.white, fontWeight: FontWeight.w800),
+        ),
         backgroundColor: Colors.pinkAccent,
         iconTheme: const IconThemeData(color: Colors.white),
         actions: [
           IconButton(
-            icon: Icon(Icons.logout, color: Colors.white),
-            onPressed: () {
-              ref.read(authProvider.notifier).logout(); 
-              Navigator.pushAndRemoveUntil(
-                context,
-                MaterialPageRoute(builder: (_) => LoginView()), 
-                (route) => false, 
-              );
-            },
+            icon: const Icon(Icons.logout, color: Colors.white),
+            onPressed: () => _confirmLogout(context),
           ),
         ],
       ),
@@ -72,10 +66,10 @@ class _HomeViewState extends ConsumerState<HomeView> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             SizedBox(height: height * 0.02),
-            const Text(
-              'Facturas y recargas',
+             Text(
+              'Operadores',
               textAlign: TextAlign.start,
-              style: TextStyle(fontSize: 30),
+              style: GoogleFonts.roboto(fontSize: 30, fontWeight: FontWeight.w800),
             ),
             SizedBox(height: height * 0.02),
             SizedBox(
@@ -92,7 +86,8 @@ class _HomeViewState extends ConsumerState<HomeView> {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                            builder: (_) => RechargeView(operator.name)),
+                          builder: (_) => RechargeView(operator.name),
+                        ),
                       );
                     },
                     child: Card(
@@ -100,8 +95,11 @@ class _HomeViewState extends ConsumerState<HomeView> {
                           borderRadius: BorderRadius.circular(12)),
                       child: Padding(
                         padding: EdgeInsets.all(width * 0.02),
-                        child: Image.asset(operator.imagePath,
-                            width: width * 0.18, height: height * 0.09),
+                        child: Image.asset(
+                          operator.imagePath,
+                          width: width * 0.18,
+                          height: height * 0.09,
+                        ),
                       ),
                     ),
                   );
@@ -117,10 +115,10 @@ class _HomeViewState extends ConsumerState<HomeView> {
                 onPressed: () {
                   Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (_) => HistoryView()),
+                    MaterialPageRoute(builder: (_) => const HistoryView()),
                   );
                 },
-                child: Icon(
+                child: const Icon(
                   Icons.receipt_long,
                   color: Colors.white,
                 ),
@@ -133,7 +131,7 @@ class _HomeViewState extends ConsumerState<HomeView> {
               ontap: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => RechargeView('')),
+                  MaterialPageRoute(builder: (_) => RechargeView('')),
                 );
               },
               text: 'Ir a Recargar',
@@ -144,6 +142,36 @@ class _HomeViewState extends ConsumerState<HomeView> {
           ],
         ),
       ),
+    );
+  }
+
+  // 🔹 Confirmación antes de cerrar sesión
+  void _confirmLogout(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: const Text("Cerrar sesión"),
+          content: const Text("¿Seguro que quieres cerrar sesión?"),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: Text("Cancelar", style: GoogleFonts.roboto(color: Colors.pinkAccent),),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                ref.read(authProvider.notifier).logout();
+                Navigator.pushAndRemoveUntil(
+                  context,
+                  MaterialPageRoute(builder: (_) => LoginView()),
+                  (route) => false,
+                );
+              },
+              child:  Text("Cerrar sesión", style: GoogleFonts.roboto(color: Colors.pinkAccent),),
+            ),
+          ],
+        );
+      },
     );
   }
 }

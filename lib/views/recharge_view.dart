@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:recargas_app/views/login_view.dart';
 import '../providers/supplier_provider.dart';
 import '../providers/recharge_provider.dart';
@@ -21,6 +22,7 @@ class RechargeView extends ConsumerStatefulWidget {
 
 class _RechargeViewState extends ConsumerState<RechargeView> {
   String? selectedProviderId;
+
   @override
   void initState() {
     super.initState();
@@ -52,9 +54,9 @@ class _RechargeViewState extends ConsumerState<RechargeView> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text(
-          'Selecciona un Proveedor',
-          style: TextStyle(color: Colors.white),
+        title:  Text(
+          'Recarga Celular',
+          style: GoogleFonts.roboto(color: Colors.white, fontWeight: FontWeight.w800),
         ),
         backgroundColor: Colors.pinkAccent,
         iconTheme: const IconThemeData(color: Colors.white),
@@ -66,15 +68,15 @@ class _RechargeViewState extends ConsumerState<RechargeView> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               const SizedBox(height: 20),
-              const Text(
+               Text(
                 'Recarga Celular',
                 textAlign: TextAlign.start,
-                style: TextStyle(fontSize: 30, fontStyle: FontStyle.italic),
+                style: GoogleFonts.roboto(fontSize: 30, fontWeight: FontWeight.w800),
               ),
               const SizedBox(height: 20),
               TextFormFieldCustom(
                 width: width,
-                hintText: 'ingresa el celular',
+                hintText: 'Ingresa el celular',
                 controller: widget.controllerCel,
                 focusNode: widget._focusNodeCel,
                 colorBorde: Colors.black12,
@@ -86,16 +88,12 @@ class _RechargeViewState extends ConsumerState<RechargeView> {
                   supplierAsyncValue.maybeWhen(
                     data: (suppliers) {
                       if (suppliers == null || suppliers.isEmpty) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                              content: Text("No hay proveedores disponibles.")),
-                        );
+                        _showMessageDialog("No hay proveedores disponibles.");
                       } else {
                         showSupplierSelection(context, suppliers);
                       }
                     },
-                    orElse: () => ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(content: Text("Cargando proveedores..."))),
+                    orElse: () => _showMessageDialog("Cargando proveedores..."),
                   );
                 },
                 child: TextFormFieldCustom(
@@ -117,10 +115,10 @@ class _RechargeViewState extends ConsumerState<RechargeView> {
                 keyboardType: TextInputType.number,
               ),
               const SizedBox(height: 20),
-              const Text(
+               Text(
                 'Cupo disponible',
                 textAlign: TextAlign.start,
-                style: TextStyle(
+                style: GoogleFonts.roboto(
                     fontSize: 20,
                     fontStyle: FontStyle.italic,
                     color: Colors.black54),
@@ -136,10 +134,10 @@ class _RechargeViewState extends ConsumerState<RechargeView> {
                 ),
                 child: const Text('\$ 300000'),
               ),
-              SizedBox(height: height * 0.32,),
+              SizedBox(height: height * 0.32),
               rechargeState.when(
                 data: (message) => message != null
-                    ? Text(message, style: TextStyle(color: Colors.green))
+                    ? Text(message, style:  GoogleFonts.roboto(color: Colors.green))
                     : ButtonCustom(
                         width: width,
                         height: height,
@@ -150,9 +148,9 @@ class _RechargeViewState extends ConsumerState<RechargeView> {
                         colorButton: Colors.pinkAccent,
                         colorText: Colors.white,
                       ),
-                loading: () => Center(child: CircularProgressIndicator()),
+                loading: () => const Center(child: CircularProgressIndicator()),
                 error: (err, _) =>
-                    Text("Error: $err", style: TextStyle(color: Colors.red)),
+                    Text("Error: $err", style:  GoogleFonts.roboto(color: Colors.red)),
               ),
               SizedBox(height: height * 0.05),
             ],
@@ -162,22 +160,23 @@ class _RechargeViewState extends ConsumerState<RechargeView> {
     );
   }
 
+  // 🔹 Intentar recarga con validación y pop-up de errores
   void _attemptRecharge() {
     final phone = widget.controllerCel.text.trim();
     final amount = double.tryParse(widget.controllerPrice.text.trim()) ?? 0;
 
     if (phone.length != 10 || !phone.startsWith('3')) {
-      _showErrorMessage("Número de teléfono inválido");
+      _showMessageDialog("Número de teléfono inválido");
       return;
     }
 
     if (amount < 1000 || amount > 100000) {
-      _showErrorMessage("El monto debe estar entre 1,000 y 100,000");
+      _showMessageDialog("El monto debe estar entre 1,000 y 100,000");
       return;
     }
 
     if (selectedProviderId == null) {
-      _showErrorMessage("Debe seleccionar un operador");
+      _showMessageDialog("Debe seleccionar un operador");
       return;
     }
 
@@ -185,7 +184,7 @@ class _RechargeViewState extends ConsumerState<RechargeView> {
         .read(rechargeProvider.notifier)
         .buyRecharge(phone, selectedProviderId!, amount);
 
-    Future.delayed(Duration(seconds: 3), () {
+    Future.delayed(const Duration(seconds: 3), () {
       setState(() {
         widget.controllerCel.clear();
         widget.controllerOperator.clear();
@@ -195,6 +194,7 @@ class _RechargeViewState extends ConsumerState<RechargeView> {
     });
   }
 
+  // 🔹 Mostrar selección de proveedores
   void showSupplierSelection(
       BuildContext context, List<Map<String, String>> suppliers) {
     showModalBottomSheet(
@@ -218,9 +218,22 @@ class _RechargeViewState extends ConsumerState<RechargeView> {
     );
   }
 
-  void _showErrorMessage(String message) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(message)),
+  // 🔹 Mostrar mensaje de error o información en un pop-up
+  void _showMessageDialog(String message) {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: const Text("Atención"),
+          content: Text(message),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child:  Text("OK",style: GoogleFonts.roboto(color: Colors.pinkAccent), )
+            ),
+          ],
+        );
+      },
     );
   }
 }

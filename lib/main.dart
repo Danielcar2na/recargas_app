@@ -7,7 +7,7 @@ import 'package:recargas_app/views/splash_view.dart';
 void main() {
   runApp(
     const ProviderScope(
-      child: MyApp(), // 🔹 Riverpod maneja el estado globalmente
+      child: MyApp(), 
     ),
   );
 }

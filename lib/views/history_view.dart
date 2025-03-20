@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:recargas_app/models/recharge_model.dart';
 import 'package:recargas_app/providers/history_provider.dart';
 import 'package:recargas_app/providers/supplier_provider.dart';
@@ -25,8 +26,8 @@ class HistoryView extends ConsumerWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Historial de Recargas',
-            style: TextStyle(color: Colors.white)),
+        title:  Text('Historial de Recargas',
+            style: GoogleFonts.roboto(color: Colors.white, fontWeight: FontWeight.w800)),
         backgroundColor: Colors.pinkAccent,
         iconTheme: const IconThemeData(color: Colors.white),
       ),
@@ -55,6 +56,7 @@ class HistoryView extends ConsumerWidget {
                     return Padding(
                       padding: EdgeInsets.symmetric(horizontal: width * 0.02),
                       child: Card(
+                        elevation: 3,
                         shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(14)),
                         child: ListTile(
@@ -152,7 +154,7 @@ class HistoryView extends ConsumerWidget {
           actions: [
             TextButton(
                 onPressed: () => Navigator.pop(context),
-                child: Text("Cancelar")),
+                child: Text("Cancelar", style: GoogleFonts.roboto(color: Colors.pinkAccent),)),
             ElevatedButton(
               onPressed: () {
                 final updatedRecharge = Recharge(
@@ -170,7 +172,7 @@ class HistoryView extends ConsumerWidget {
                     .updateRecharge(updatedRecharge);
                 Navigator.pop(context);
               },
-              child: Text("Guardar"),
+              child: Text("Guardar", style: GoogleFonts.roboto(color: Colors.pinkAccent),),
             ),
           ],
         );
