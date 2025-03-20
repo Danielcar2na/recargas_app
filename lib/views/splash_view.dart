@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:recargas_app/routes/paths.dart';
-import 'package:recargas_app/views/home_view.dart';
+import 'package:recargas_app/views/login_view.dart';
 
 class SplashScreen extends ConsumerStatefulWidget {
   @override
@@ -20,7 +20,7 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
     if (mounted) {
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (context) => HomeView()),
+        MaterialPageRoute(builder: (context) => LoginView()),
       );
     }
   }

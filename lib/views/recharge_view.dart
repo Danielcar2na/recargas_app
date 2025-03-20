@@ -28,30 +28,48 @@ class _RechargeViewState extends ConsumerState<RechargeView> {
   void initState() {
     super.initState();
 
-    if (widget.supplierHome.isNotEmpty) {
-      Future.microtask(() {
-        final suppliers = ref.read(supplierProvider).value;
-        if (suppliers != null) {
-          for (var supplier in suppliers) {
-            if (widget.supplierHome == supplier["name"]) {
-              setState(() {
-                widget.controllerOperator.text = supplier["name"]!;
-                selectedProviderId = supplier["id"]!;
-              });
-              break;
-            }
-          }
-        }
-      });
-    }
+    // if (widget.supplierHome.isNotEmpty) {
+    //   Future.microtask(() {
+    //     final suppliers = ref.read(supplierProvider).value;
+    //     if (suppliers != null) {
+    //       for (var supplier in suppliers) {
+    //         if (widget.supplierHome == supplier["name"]) {
+    //           setState(() {
+    //             widget.controllerOperator.text = supplier["name"]!;
+    //             selectedProviderId = supplier["id"]!;
+    //           });
+    //           break;
+    //         }
+    //       }
+    //     }
+    //   });
+    // }
   }
 
   @override
   Widget build(BuildContext context) {
-    final supplierAsyncValue = ref.watch(supplierProvider);
     final rechargeState = ref.watch(rechargeProvider);
     final double width = MediaQuery.of(context).size.width;
     final double height = MediaQuery.of(context).size.height;
+    final supplierAsyncValue = ref.watch(supplierProvider);
+
+    supplierAsyncValue.whenData((suppliers) {
+    if (suppliers != null) {
+      for (var supplier in suppliers) {
+        if (widget.supplierHome == supplier["name"]) {
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            setState(() {
+              widget.controllerOperator.text = supplier["name"]!;
+              selectedProviderId = supplier["id"]!;
+            });
+          });
+          break;
+        }
+      }
+    }
+  });
+
+   
 
     return Scaffold(
       appBar: AppBar(
